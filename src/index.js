@@ -11,16 +11,18 @@ import {
   handleLGButtons
 } from './games/werewolfGame.js';
 
+import {
+  handleHoleCommand,
+  handleHoleButtons,
+  handleHoleModal
+} from './games/holeGame.js';
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers
   ]
 });
-
-/* ========================
-   🎨 STYLE GLOBAL
-======================== */
 
 export const COLORS = {
   main: 0x8B5CF6,
@@ -38,25 +40,13 @@ export function embed(title, description, color = COLORS.main) {
     .setTimestamp();
 }
 
-/* ========================
-   🔐 ADMIN CHECK
-======================== */
-
 export function isAdmin(member) {
   return member?.permissions?.has(PermissionFlagsBits.ManageGuild) ?? false;
 }
 
-/* ========================
-   🚀 READY
-======================== */
-
 client.once('ready', () => {
   console.log(`🔥 Bot connecté en tant que ${client.user.tag}`);
 });
-
-/* ========================
-   🎮 INTERACTIONS
-======================== */
 
 client.on('interactionCreate', async interaction => {
   try {
@@ -65,12 +55,28 @@ client.on('interactionCreate', async interaction => {
         return await handleLGCommand(interaction, client);
       }
 
+      if (interaction.commandName === 'confighole' || interaction.commandName === 'holecreate') {
+        return await handleHoleCommand(interaction, client);
+      }
+
       return;
     }
 
     if (interaction.isButton()) {
       if (interaction.customId.startsWith('lg_')) {
         return await handleLGButtons(interaction, client);
+      }
+
+      if (interaction.customId.startsWith('hole_')) {
+        return await handleHoleButtons(interaction, client);
+      }
+
+      return;
+    }
+
+    if (interaction.isModalSubmit()) {
+      if (interaction.customId.startsWith('hole_')) {
+        return await handleHoleModal(interaction, client);
       }
 
       return;
@@ -91,16 +97,8 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
-/* ========================
-   ⚠️ ERREURS
-======================== */
-
 process.on('unhandledRejection', err => console.error('Unhandled rejection:', err));
 process.on('uncaughtException', err => console.error('Uncaught exception:', err));
-
-/* ========================
-   🔑 LOGIN
-======================== */
 
 if (!process.env.DISCORD_TOKEN) {
   console.error('DISCORD_TOKEN manquant');

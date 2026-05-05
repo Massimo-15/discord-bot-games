@@ -184,6 +184,48 @@ const commands = [
         .setDescription('Arrête la partie en cours')
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+    .toJSON(),
+
+  new SlashCommandBuilder()
+    .setName('confighole')
+    .setDescription('Configure le jeu des phrases à trous')
+    .addIntegerOption(option =>
+      option.setName('lobby_sec')
+        .setDescription('Durée du lobby en secondes')
+        .setMinValue(10)
+        .setMaxValue(600)
+    )
+    .addIntegerOption(option =>
+      option.setName('choix_trous_sec')
+        .setDescription('Durée du choix du nombre de trous en secondes')
+        .setMinValue(10)
+        .setMaxValue(300)
+    )
+    .addIntegerOption(option =>
+      option.setName('ecriture_sec')
+        .setDescription('Durée pour écrire sa phrase en secondes')
+        .setMinValue(20)
+        .setMaxValue(600)
+    )
+    .addIntegerOption(option =>
+      option.setName('reponse_sec')
+        .setDescription('Durée pour répondre à chaque phrase en secondes')
+        .setMinValue(20)
+        .setMaxValue(600)
+    )
+    .addIntegerOption(option =>
+      option.setName('vote_sec')
+        .setDescription('Durée du vote en secondes')
+        .setMinValue(10)
+        .setMaxValue(300)
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+    .toJSON(),
+
+  new SlashCommandBuilder()
+    .setName('holecreate')
+    .setDescription('Lance une partie du jeu des phrases à trous')
+    .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
     .toJSON()
 ];
 
@@ -199,4 +241,4 @@ await rest.put(
   { body: commands }
 );
 
-console.log('Commandes DYNASTY-GAMES installées : /teams et /lg.');
+console.log('Commandes DYNASTY-GAMES installées : /teams, /lg, /confighole et /holecreate.');
