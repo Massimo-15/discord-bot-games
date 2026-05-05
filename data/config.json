@@ -1,0 +1,19 @@
+{
+  "1417925647006826560": {
+    "channelId": "1499036124063072458",
+    "minPlayers": 4,
+    "maxPlayers": 10,
+    "wolves": 2,
+    "roles": {
+      "seer": true,
+      "witch": true,
+      "hunter": true
+    },
+    "timers": {
+      "lobby": 120,
+      "night": 60,
+      "day": 60,
+      "vote": 180
+    }
+  }
+}

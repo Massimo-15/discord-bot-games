@@ -1,0 +1,16 @@
+{
+  "name": "loup-garou-discord-bot",
+  "version": "1.0.0",
+  "description": "Bot Discord Loup-Garou personnalisable pour salon textuel",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "deploy": "node src/deploy-commands.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.26.3",
+    "dotenv": "^16.4.7",
+    "node-cron": "^4.2.1"
+  }
+}
