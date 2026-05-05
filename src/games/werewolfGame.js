@@ -13,6 +13,12 @@ import path from 'node:path';
 const LG_CHANNEL_ID = '1499036124063072458';
 const CONFIG_FILE = './data/config.json';
 
+const ADMIN_ROLE_IDS = [
+  '1417927213419860019',
+  '1427065126065934436',
+  '1442300974508019792'
+];
+
 const COLORS = {
   main: 0x8B5CF6,
   success: 0x22C55E,
@@ -125,7 +131,12 @@ function embed(title, description, color = COLORS.main) {
 }
 
 function isAdmin(member) {
-  return member?.permissions?.has(PermissionFlagsBits.ManageGuild);
+  if (!member) return false;
+
+  const hasManageGuild = member.permissions.has(PermissionFlagsBits.ManageGuild);
+  const hasAdminRole = member.roles.cache.some(role => ADMIN_ROLE_IDS.includes(role.id));
+
+  return hasManageGuild || hasAdminRole;
 }
 
 function roleName(role) {
@@ -371,10 +382,6 @@ function nextAfterSeer(game, cfg) {
   return 'night_witch';
 }
 
-/* ========================
-   COMMANDES
-======================== */
-
 export async function handleLGCommand(interaction, client) {
   if (!assertGameChannel(interaction)) return wrongChannelReply(interaction);
 
@@ -389,7 +396,7 @@ export async function handleLGCommand(interaction, client) {
   if (sub === 'begin') return beginCommand(interaction, client);
   if (sub === 'skip') return skipPhase(interaction, client);
   if (sub === 'vote') return voteCommand(interaction);
-  if (sub === 'action') return actionCommand(interaction, client);
+  if (sub === 'action') return actionCommand(interaction);
   if (sub === 'status') return statusCommand(interaction);
   if (sub === 'stop') return stopCommand(interaction);
 }
@@ -510,6 +517,13 @@ async function viewConfig(interaction, cfg) {
 }
 
 async function startLobby(interaction) {
+  if (!isAdmin(interaction.member)) {
+    return interaction.reply({
+      content: 'Seuls les modérateurs peuvent créer une session de jeu.',
+      ephemeral: true
+    });
+  }
+
   const cfg = getGuildConfig(interaction.guildId);
 
   if (getGame(interaction.guildId)) {
