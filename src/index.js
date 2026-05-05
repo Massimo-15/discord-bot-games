@@ -3,9 +3,6 @@ import {
   Client,
   GatewayIntentBits,
   EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
   PermissionFlagsBits
 } from 'discord.js';
 
@@ -46,7 +43,7 @@ export function embed(title, description, color = COLORS.main) {
 ======================== */
 
 export function isAdmin(member) {
-  return member.permissions.has(PermissionFlagsBits.ManageGuild);
+  return member?.permissions?.has(PermissionFlagsBits.ManageGuild) ?? false;
 }
 
 /* ========================
@@ -63,37 +60,33 @@ client.once('ready', () => {
 
 client.on('interactionCreate', async interaction => {
   try {
+    if (interaction.isChatInputCommand()) {
+      if (interaction.commandName === 'lg') {
+        return await handleLGCommand(interaction, client);
+      }
 
-    /* ========================
-       🐺 COMMANDES LG
-    ======================== */
-
-    if (interaction.isChatInputCommand() && interaction.commandName === 'lg') {
-      return handleLGCommand(interaction, client);
+      return;
     }
-
-    /* ========================
-       🐺 BOUTONS LG
-    ======================== */
 
     if (interaction.isButton()) {
       if (interaction.customId.startsWith('lg_')) {
-        return handleLGButtons(interaction, client);
+        return await handleLGButtons(interaction, client);
       }
-    }
 
+      return;
+    }
   } catch (err) {
-    console.error(err);
+    console.error('Erreur interactionCreate:', err);
 
     const msg = {
-      content: '❌ Erreur interne du bot.',
+      content: '❌ Erreur interne du bot. Regarde les logs Railway.',
       ephemeral: true
     };
 
-    if (interaction.replied || interaction.deferred) {
-      interaction.followUp(msg).catch(() => {});
+    if (interaction.deferred || interaction.replied) {
+      await interaction.followUp(msg).catch(() => {});
     } else {
-      interaction.reply(msg).catch(() => {});
+      await interaction.reply(msg).catch(() => {});
     }
   }
 });
@@ -102,15 +95,15 @@ client.on('interactionCreate', async interaction => {
    ⚠️ ERREURS
 ======================== */
 
-process.on('unhandledRejection', err => console.error('Unhandled:', err));
-process.on('uncaughtException', err => console.error('Uncaught:', err));
+process.on('unhandledRejection', err => console.error('Unhandled rejection:', err));
+process.on('uncaughtException', err => console.error('Uncaught exception:', err));
 
 /* ========================
    🔑 LOGIN
 ======================== */
 
 if (!process.env.DISCORD_TOKEN) {
-  console.error('Token manquant');
+  console.error('DISCORD_TOKEN manquant');
   process.exit(1);
 }
 
